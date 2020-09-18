@@ -43,7 +43,6 @@ import org.mule.runtime.module.extension.internal.runtime.resolver.ParametersRes
 import org.mule.runtime.module.extension.internal.runtime.resolver.ResolverSet;
 import org.mule.runtime.module.extension.internal.util.ReflectionCache;
 import org.mule.runtime.module.extension.internal.value.ValueProviderMediator;
-import org.mule.runtime.module.tooling.internal.artifact.context.LoggingResolvingContext;
 import org.mule.runtime.module.tooling.internal.utils.ArtifactHelper;
 
 import java.util.HashMap;
@@ -78,9 +77,8 @@ public class ValueProviderExecutor {
       ParameterValueResolver parameterValueResolver = parameterValueResolver(parameterizedElementDeclaration, parameterizedModel);
       ValueProviderMediator valueProviderMediator = createValueProviderMediator(parameterizedModel);
 
-      LoggingResolvingContext context =
-          new LoggingResolvingContext(new ExtensionResolvingContext(() -> optionalConfigurationInstance,
-                                                                    connectionManager));
+      ExtensionResolvingContext context = new ExtensionResolvingContext(() -> optionalConfigurationInstance,
+                                                                        connectionManager);
       ClassLoader extensionClassLoader = getClassLoader(artifactHelper.getExtensionModel(parameterizedElementDeclaration));
       try {
         return resultFrom(withContextClassLoader(extensionClassLoader, () -> valueProviderMediator.getValues(providerName,
@@ -103,11 +101,11 @@ public class ValueProviderExecutor {
     }
   }
 
-  private Supplier<Object> connectionSupplier(LoggingResolvingContext context) {
+  private Supplier<Object> connectionSupplier(ExtensionResolvingContext context) {
     return (CheckedSupplier<Object>) () -> context.getConnection().orElse(null);
   }
 
-  private Supplier<Object> configSupplier(LoggingResolvingContext context) {
+  private Supplier<Object> configSupplier(ExtensionResolvingContext context) {
     return (CheckedSupplier<Object>) () -> context.getConfig().orElse(null);
   }
 
